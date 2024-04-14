@@ -46,7 +46,7 @@ app.post('/login', async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, { expiresIn: '24h' });
     res.json({ token });
   } catch (error) {
     console.error(error);
@@ -94,7 +94,7 @@ app.post('/diary', authenticateUser, async (req, res) => {
       location,
       userId: req.userData.userId // Set the user ID from decoded token
     });
-    res.status(201).json(newDiaryEntry);
+    res.status(201).json({ diary_entry_id: newDiaryEntry.id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -108,7 +108,16 @@ app.get('/diary', authenticateUser, async (req, res) => {
     if (diaryEntries.length === 0) {
         return res.status(404).json({ message: 'No diary entries found for this User' });
     } else {
-        res.json(diaryEntries);
+      const response = diaryEntries.map(diaryEntry => {
+        return {
+          id: diaryEntry.id,
+          title: diaryEntry.title,
+          description: diaryEntry.description,
+          date: diaryEntry.date,
+          location: diaryEntry.location
+        };
+      });
+      res.json(response);
     }
   } catch (error) {
     console.error(error);
@@ -127,7 +136,14 @@ app.get('/diary/:id', authenticateUser, async (req, res) => {
     if (diaryEntry.userId !== req.userData.userId) {
       return res.status(403).json({ message: 'You are not authorized to view this diary entry' });
     }
-    res.json(diaryEntry);
+    const response = {
+      id: diaryEntry.id,
+      title: diaryEntry.title,
+      description: diaryEntry.description,
+      date: diaryEntry.date,
+      location: diaryEntry.location
+    };
+    res.json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -147,7 +163,14 @@ app.put('/diary/:id', authenticateUser, async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to update this diary entry' });
     }
     await diaryEntry.update({ title, description, date, location });
-    res.json(diaryEntry);
+    const response = {
+      id: diaryEntry.id,
+      title: diaryEntry.title,
+      description: diaryEntry.description,
+      date: diaryEntry.date,
+      location: diaryEntry.location
+    };
+    res.json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

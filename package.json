@@ -1,10 +1,10 @@
 {
-  "name": "travel-diary",
+  "name": "travel-diary-backend",
   "version": "1.0.0",
   "description": "Travel Diary Platform Backend",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js"
   },
   "author": "srikanth-kandi",
   "license": "ISC",

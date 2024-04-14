@@ -2,7 +2,20 @@ const { Sequelize, DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const sequelize = new Sequelize(`postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DATABASE}`);
+const sequelize = new Sequelize({
+  dialect: 'postgres',
+  database: process.env.DATABASE,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  dialectOptions: {
+      ssl: {
+          rejectUnauthorized: true,
+          ca: process.env.CA
+      }
+  }
+});
 
 const User = sequelize.define('User', {
   username: { type: DataTypes.STRING, allowNull: false, unique: true },
