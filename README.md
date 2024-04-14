@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS "DiaryEntry" (
 1. Clone the repository
 2. Run `npm install` to install the dependencies
 3. Create a `.env` file in the root directory and add the following environment variables
+
     ```
     DATABASE=YOUR_DATABASE_NAME
     DB_USER=YOUR_DATABASE_USERNAME
@@ -112,41 +113,58 @@ Diary entries created by `srikanth`
     - Endpoint: `/register`
     - Method: `POST`
     - Request Body:
+        The `"username"` and `"email"` must be unique.
+
         ```json
         {
-            "username": "example", // must be unique
-            "email": "example@example.com", // must be unique
+            "username": "example",
+            "email": "example@example.com",
             "password": "example_password"
         }
         ```
     - Response:
         - Status Code: `201`
         - Response Body:
+
             ```json
             {
-                "message": "User registered successfully."
+                "user_id": 3
             }
             ```
     - Error Response:
         - Status Code: `400`
         - Response Body:
+        If the `"username"`, `"email"` or `"password"` is missing or `null`.
+
             ```json
             {
-                "error": "Username is already taken."
+                "message": "username, email and password are required"
             }
             ```
         - Status Code: `400`
         - Response Body:
+        If the user with the same email already exists.
+
             ```json
             {
-                "error": "Email is already taken."
+                "message": "User with this email already exists"
+            }
+            ```
+        - Status Code: `400`
+        - Response Body:
+        If the user with the same username already exists.
+
+            ```json
+            {
+                "message": "User with this username already exists"
             }
             ```
         - Status Code: `500`
         - Response Body:
+
             ```json
             {
-                "error": "Internal Server Error."
+                "message": "Internal server error"
             }
             ```
 
@@ -155,41 +173,75 @@ Diary entries created by `srikanth`
     - Endpoint: `/login`
     - Method: `POST`
     - Request Body:
+    The `"email"` must be registered and the `"password"` must be correct.
+
         ```json
         {
-            "email": "example@example.com", // must be registered
-            "password": "example_password" // must be correct
+            "email": "example@example.com",
+            "password": "example_password"
         }
         ```
     - Response:
         - Status Code: `200`
         - Response Body:
+        Returns a token which is required to access the `Diary` endpoints and is valid for 24 hours.
+
             ```json
             {
-                "message": "User logged in successfully."
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTcxMzA5NzMzOCwiZXhwIjoxNzEzMTgzNzM4fQ.InBy9ClIQWzk8dFZEKzHVQE3it3f8ejv-1evy8gIEL8"
             }
             ```
     - Error Response:
         - Status Code: `400`
         - Response Body:
+        If the `"email"` or `"password"` is missing or `null`.
+
             ```json
             {
-                "error": "Invalid email or password."
+                "message": "email and password are required"
+            }
+            ```
+        - Status Code: `404`
+        - Response Body:
+        If the user with the given email is not found.
+
+            ```json
+            {
+                "message": "User not found"
+            }
+            ```
+        - Status Code: `401`
+        - Response Body:
+        If the password is incorrect.
+
+            ```json
+            {
+                "message": "Invalid credentials"
             }
             ```
         - Status Code: `500`
         - Response Body:
+
             ```json
             {
-                "error": "Internal Server Error."
+                "message": "Internal server error"
             }
             ```
+
+Before proceeding to below endpoints the token received from the `/login` endpoint must be added to the request headers as `Authorization: Bearer TOKEN_RECEIVED_FROM_LOGIN_ENDPOINT`. Falied to provide the token will result in below response from the server.
+
+```json
+{
+    "message": "Authentication failed"
+}
+```
 
 3. **Create Diary Entry**
 
     - Endpoint: `/diary`
     - Method: `POST`
     - Request Body:
+
         ```json
         {
             "title": "Trip to Goa",
@@ -201,17 +253,54 @@ Diary entries created by `srikanth`
     - Response:
         - Status Code: `201`
         - Response Body:
+
             ```json
             {
-                "message": "Diary entry created successfully."
+                "diary_entry_id": "1"
             }
             ```
     - Error Response:
+        - Status Code: `400`
+        - Response Body:
+        If the `"title"` is missing on `null`.
+
+            ```json
+            {
+                "message": "title is required"
+            }
+            ```
+        - Status Code: `400`
+        - Response Body:
+        If the `"description"` is missing on `null`.
+
+            ```json
+            {
+                "message": "description is required"
+            }
+            ```
+        - Status Code: `400`
+        - Response Body:
+        If the `"date"` is missing on `null`.
+
+            ```json
+            {
+                "message": "date is required"
+            }
+            ```
+        - Status Code: `400`
+        - Response Body:
+        If the `"location"` is missing on `null`.
+
+            ```json
+            {
+                "message": "location is required"
+            }
+            ```
         - Status Code: `500`
         - Response Body:
             ```json
             {
-                "error": "Internal Server Error."
+                "message": "Internal server error"
             }
             ```
 
@@ -222,6 +311,8 @@ Diary entries created by `srikanth`
     - Response:
         - Status Code: `200`
         - Response Body:
+        Returns all diary entries created by the user.
+
             ```json
             [
                 {
@@ -229,27 +320,32 @@ Diary entries created by `srikanth`
                     "title": "Trip to Goa",
                     "description": "Visited Goa with friends. Had a great time.",
                     "date": "2021-06-01",
-                    "location": "Goa",
-                    "createdAt": "2021-09-01T10:00:00.000Z",
-                    "updatedAt": "2021-09-01T10:00:00.000Z"
+                    "location": "Goa"
                 },
                 {
                     "id": 2,
                     "title": "Trekking in Himalayas",
                     "description": "Trekking in Himalayas was an amazing experience.",
                     "date": "2021-07-01",
-                    "location": "Himalayas",
-                    "createdAt": "2021-09-01T10:00:00.000Z",
-                    "updatedAt": "2021-09-01T10:00:00.000Z"
+                    "location": "Himalayas"
                 }
             ]
             ```
     - Error Response:
+        - Status Code: `404`
+        - Response Body:
+        If there are no diary entries created by the user.
+
+            ```json
+            {
+                "message": "No diary entries found for this User"
+            }
+            ```
         - Status Code: `500`
         - Response Body:
             ```json
             {
-                "error": "Internal Server Error."
+                "message": "Internal server error"
             }
             ```
 
@@ -260,6 +356,7 @@ Diary entries created by `srikanth`
     - Response:
         - Status Code: `200`
         - Response Body:
+
             ```json
             {
                 "id": 1,
@@ -267,23 +364,33 @@ Diary entries created by `srikanth`
                 "description": "Visited Goa with friends. Had a great time.",
                 "date": "2021-06-01",
                 "location": "Goa",
-                "createdAt": "2021-09-01T10:00:00.000Z",
-                "updatedAt": "2021-09-01T10:00:00.000Z"
             }
             ```
     - Error Response:
         - Status Code: `404`
         - Response Body:
+        If the diary entry with the given ID is not found.
+
             ```json
             {
-                "error": "Diary entry not found."
+                "message": "Diary entry not found."
+            }
+            ```
+        - Status Code: `403`
+        - Response Body:
+        If the diary entry does not belong to the logged in User.
+
+            ```json
+            {
+                "message": "You are not authorized to view this diary entry"
             }
             ```
         - Status Code: `500`
         - Response Body:
+
             ```json
             {
-                "error": "Internal Server Error."
+                "message": "Internal server error"
             }
             ```
 
@@ -292,6 +399,7 @@ Diary entries created by `srikanth`
     - Endpoint: `/diary/:id`
     - Method: `PUT`
     - Request Body:
+
         ```json
         {
             "title": "Trip to Goa",
@@ -301,26 +409,43 @@ Diary entries created by `srikanth`
         }
         ```
     - Response:
-        - Status Code: `200`
+        - Status Code: `201`
         - Response Body:
+
             ```json
             {
-                "message": "Diary entry updated successfully."
+                "id": 1,
+                "title": "Trip to Goa",
+                "description": "Visited Goa with friends. Had a great time.",
+                "date": "2021-06-01",
+                "location": "Goa"
             }
             ```
     - Error Response:
         - Status Code: `404`
         - Response Body:
+            If the diary entry with the given ID is not found.
+
             ```json
             {
-                "error": "Diary entry not found."
+                "message": "Diary entry not found."
+            }
+            ```
+        - Status Code: `403`
+        - Response Body:
+            If the diary entry trying to update does not belong to the logged in User.
+
+            ```json
+            {
+                "message": "You are not authorized to update this diary entry"
             }
             ```
         - Status Code: `500`
         - Response Body:
+
             ```json
             {
-                "error": "Internal Server Error."
+                "message": "Internal server error"
             }
             ```
 
@@ -331,23 +456,36 @@ Diary entries created by `srikanth`
     - Response:
         - Status Code: `200`
         - Response Body:
+
             ```json
             {
-                "message": "Diary entry deleted successfully."
+                "message": "Diary entry deleted successfully"
             }
             ```
     - Error Response:
         - Status Code: `404`
         - Response Body:
+            If the diary entry with the given ID is not found.
+
             ```json
             {
-                "error": "Diary entry not found."
+                "message": "Diary entry not found"
+            }
+            ```
+        - Status Code: `403`
+        - Response Body:
+            If the diary entry trying to delete does not belong to the logged in User.
+
+            ```json
+            {
+                "message": "You are not authorized to delete this diary entry"
             }
             ```
         - Status Code: `500`
         - Response Body:
+
             ```json
             {
-                "error": "Internal Server Error."
+                "message": "Internal server error"
             }
             ```

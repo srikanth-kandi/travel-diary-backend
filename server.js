@@ -170,7 +170,7 @@ app.put('/diary/:id', authenticateUser, async (req, res) => {
       date: diaryEntry.date,
       location: diaryEntry.location
     };
-    res.json(response);
+    res.status(201).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
