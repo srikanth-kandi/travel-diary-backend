@@ -1,4 +1,10 @@
-# Travel Diary Backend
+# Travel Diary Backend API
+
+Live API URL - [https://travel-diary-backend-gw2v.onrender.com/](https://travel-diary-backend-gw2v.onrender.com/)
+
+Since the API is currently deployed on the **Free Web Service** of [Render](https://render.com), sometimes the server may be in sleep mode. If you encounter any issues, please try after some time. Thank you!
+
+> Your free instance will spin down with inactivity, which can delay requests by 50 seconds or more.
 
 ### Database Schema
 
